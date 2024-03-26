@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <ctime>
+#include <chrono>
+#include <random>
 
 class StudentSorter {
 private:
@@ -97,9 +100,69 @@ private:
             }
         }
     }
+
+public:
+    void chooseSortMethod(int method, std::vector<int>& arr) {
+        switch (method) {
+            case 1:
+                insertionSort(arr);
+                break;
+            case 2:
+                quickSort(arr, 0, arr.size() - 1);
+                break;
+            case 3:
+                mergeSort(arr, 0, arr.size() - 1);
+                break;
+            case 4:
+                heapSort(arr);
+                break;
+            default:
+                std::cout << "Invalid choice!" << std::endl;
+        }
+    }
+
+    void generateRandomData(std::vector<int>& arr) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> x_dist(10, 100000);
+        std::uniform_int_distribution<> y_dist(1, 50000);
+
+        int x = x_dist(gen);
+        for (int i = 0; i < x; ++i) {
+            arr.push_back(y_dist(gen));
+        }
+    }
+
+    void measureTime(int method) {
+        double total_time = 0;
+        for (int i = 0; i < 20; ++i) {
+            std::vector<int> arr;
+            generateRandomData(arr);
+
+            auto start = std::chrono::high_resolution_clock::now();
+
+            chooseSortMethod(method, arr);
+
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> diff = end - start;
+            total_time += diff.count();
+        }
+        std::cout << "Average time taken: " << (total_time / 20) * 1e9 << " nanoseconds" << std::endl;
+    }
 };
 
 int main() {
-    
+    StudentSorter sorter;
+    int choice;
+
+    std::cout << "Choose a sorting method:\n";
+    std::cout << "1. Insertion Sort\n";
+    std::cout << "2. Quick Sort\n";
+    std::cout << "3. Merge Sort\n";
+    std::cout << "4. Heap Sort\n";
+    std::cin >> choice;
+
+    sorter.measureTime(choice);
+
     return 0;
 }

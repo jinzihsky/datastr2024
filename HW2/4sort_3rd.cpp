@@ -41,7 +41,7 @@ private:
 
     static void mergeSort(std::vector<int>& arr, int l, int r) {
         if (l < r) {
-            int m = l + (r - l) / 2;
+            int m = l + (r - l + 1) / 2;
             mergeSort(arr, l, m);
             mergeSort(arr, m + 1, r);
 
@@ -64,7 +64,7 @@ private:
         int n = arr.size();
         for (int i = n / 2 - 1; i >= 0; i--) {
             int parent = i;
-            while (parent < n / 2) {
+            while (parent >= 0) {
                 int largest = parent;
                 int left = 2 * parent + 1;
                 int right = 2 * parent + 2;
@@ -155,11 +155,11 @@ int main() {
     StudentSorter sorter;
     int choice;
 
-    std::cout << "Choose a sorting method:\n";
     std::cout << "1. Insertion Sort\n";
     std::cout << "2. Quick Sort\n";
     std::cout << "3. Merge Sort\n";
     std::cout << "4. Heap Sort\n";
+    std::cout << "Choose a sorting method:";
     std::cin >> choice;
 
     sorter.measureTime(choice);

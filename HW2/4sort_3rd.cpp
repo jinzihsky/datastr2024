@@ -10,38 +10,38 @@ private:
     std::vector<int> numbers;
 
     static void insertionSort(std::vector<int>& arr) {
-        int i, j, key;
+        int i, j, k;
         for (i = 1; i < arr.size(); i++) {
-            key = arr[i];
+            k = arr[i];
             j = i - 1;
-            while (j >= 0 && arr[j] > key) {
+            while (j >= 0 && arr[j] > k) {
                 arr[j + 1] = arr[j];
                 j = j - 1;
             }
-            arr[j + 1] = key;
+            arr[j + 1] = k;
         }
     }
 
-    static void quickSort(std::vector<int>& arr, int low, int high) {
-        if (low < high) {
-            int pivot = arr[high];
-            int i = (low - 1);
-            for (int j = low; j < high; j++) {
-                if (arr[j] < pivot) {
+    static void quickSort(std::vector<int>& arr, int l, int h) {
+        if (l < h) {
+            int p = arr[h];
+            int i = (l - 1);
+            for (int j = l; j < h; j++) {
+                if (arr[j] < p) {
                     i++;
                     std::swap(arr[i], arr[j]);
                 }
             }
-            std::swap(arr[i + 1], arr[high]);
+            std::swap(arr[i + 1], arr[h]);
             int pi = i + 1;
-            quickSort(arr, low, pi - 1);
-            quickSort(arr, pi + 1, high);
+            quickSort(arr, l, pi - 1);
+            quickSort(arr, pi + 1, h);
         }
     }
 
     static void mergeSort(std::vector<int>& arr, int l, int r) {
         if (l < r) {
-            int m = l + (r - l + 1) / 2;
+            int m = l + (r - l) / 2; 
             mergeSort(arr, l, m);
             mergeSort(arr, m + 1, r);
 
@@ -60,43 +60,44 @@ private:
         }
     }
 
+
     static void heapSort(std::vector<int>& arr) {
         int n = arr.size();
         for (int i = n / 2 - 1; i >= 0; i--) {
-            int parent = i;
-            while (parent >= 0) {
-                int largest = parent;
-                int left = 2 * parent + 1;
-                int right = 2 * parent + 2;
+            int p = i;
+            while (p >= 0) {
+                int lg = p;
+                int l = 2 * p + 1;
+                int r = 2 * p + 2;
 
-                if (left < n && arr[left] > arr[largest])
-                    largest = left;
-                if (right < n && arr[right] > arr[largest])
-                    largest = right;
+                if (l < n && arr[l] > arr[lg])
+                    lg = l;
+                if (r < n && arr[r] > arr[lg])
+                    lg = r;
 
-                if (largest == parent)
+                if (lg == p)
                     break;
-                std::swap(arr[parent], arr[largest]);
-                parent = largest;
+                std::swap(arr[p], arr[lg]);
+                p = lg;
             }
         }
         for (int i = n - 1; i > 0; i--) {
             std::swap(arr[0], arr[i]);
-            int parent = 0;
-            while (parent < i / 2) {
-                int largest = parent;
-                int left = 2 * parent + 1;
-                int right = 2 * parent + 2;
+            int p = 0;
+            while (p < i / 2) {
+                int lg = p;
+                int l = 2 * p + 1;
+                int r = 2 * p + 2;
 
-                if (left < i && arr[left] > arr[largest])
-                    largest = left;
-                if (right < i && arr[right] > arr[largest])
-                    largest = right;
+                if (l < i && arr[l] > arr[lg])
+                    lg = l;
+                if (r < i && arr[r] > arr[lg])
+                    lg = r;
 
-                if (largest == parent)
+                if (lg == p)
                     break;
-                std::swap(arr[parent], arr[largest]);
-                parent = largest;
+                std::swap(arr[p], arr[lg]);
+                p = lg;
             }
         }
     }
@@ -104,8 +105,6 @@ private:
 public:
     void sortRandomNumbers(int count, int sortingMethod) {
         std::vector<int> arr(count);
-        
-        // Generate random numbers
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int> dis(1, 50000);
@@ -113,10 +112,7 @@ public:
         for (int i = 0; i < count; ++i) {
             arr[i] = dis(gen);
         }
-        
         auto start = std::chrono::high_resolution_clock::now();
-        
-        // Choose sorting method
         switch(sortingMethod) {
             case 1:
                 insertionSort(arr);
@@ -139,7 +135,7 @@ public:
         
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
         
-        std::cout << count << ":" << sortingMethod << ": " << duration.count() << " ns\n";
+        std::cout<< duration.count() << "\n";
     }
 };
 

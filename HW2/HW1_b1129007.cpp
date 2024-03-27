@@ -103,17 +103,53 @@ private:
     }
 
 public:
-    void sortRandomNumbers(int count, int sortingMethod) {
-        std::vector<int> arr(count);
+    void printSortedNumbers(int c, int s) {
+        std::vector<int> arr(c);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dis(1, 50000);
+
+        for (int i = 0; i < c; ++i) {
+            arr[i] = dis(gen);
+        }
+        for (int i = 0; i < c; ++i) {
+            std::cout<<arr[i] << "  ";
+        }
+        std::cout<<"\n";
+        switch(s) {
+            case 1:
+                insertionSort(arr);
+                break;
+            case 2:
+                quickSort(arr, 0, arr.size() - 1);
+                break;
+            case 3:
+                mergeSort(arr, 0, arr.size() - 1);
+                break;
+            case 4:
+                heapSort(arr);
+                break;
+            default:
+                std::cout << "Invalid sorting method.\n";
+                return;
+        }
+        for(int num : arr) {
+            std::cout << num << " ";
+        }
+        std::cout << "\n";
+    }
+
+    void sortRandomNumbers(int c, int s) {
+        std::vector<int> arr(c);
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int> dis(1, 50000);
         
-        for (int i = 0; i < count; ++i) {
+        for (int i = 0; i < c; ++i) {
             arr[i] = dis(gen);
         }
         auto start = std::chrono::high_resolution_clock::now();
-        switch(sortingMethod) {
+        switch(s) {
             case 1:
                 insertionSort(arr);
                 break;
@@ -142,35 +178,49 @@ public:
 int main() {
     StudentSorter sorter;
     int c;
+    char b;
 
     std::cout << "1. Insertion Sort\n";
     std::cout << "2. Quick Sort\n";
     std::cout << "3. Merge Sort\n";
     std::cout << "4. Heap Sort\n";
-    std::cout << "Choose a sorting method:";
+    std::cout << "Choose a sorting method: ";
     std::cin >> c;
-    
-    sorter.sortRandomNumbers(10, c);
-    sorter.sortRandomNumbers(50, c);
-    sorter.sortRandomNumbers(100, c);
-    sorter.sortRandomNumbers(200, c);
-    sorter.sortRandomNumbers(500, c);
-    sorter.sortRandomNumbers(800, c);
-    sorter.sortRandomNumbers(1000, c);
-    sorter.sortRandomNumbers(1500, c);
-    sorter.sortRandomNumbers(3000, c);
-    sorter.sortRandomNumbers(4500, c);
-    sorter.sortRandomNumbers(6000, c);
-    sorter.sortRandomNumbers(8000, c);
-    sorter.sortRandomNumbers(10000, c);
-    sorter.sortRandomNumbers(12500, c);
-    sorter.sortRandomNumbers(25000, c);
-    sorter.sortRandomNumbers(37500, c);
-    sorter.sortRandomNumbers(50000, c);
-    sorter.sortRandomNumbers(62500, c);
-    sorter.sortRandomNumbers(75000, c);
-    sorter.sortRandomNumbers(87500, c);
-    sorter.sortRandomNumbers(100000, c);
+
+    std::cout << "Do you want to enter the number of elements manually? (y/n): ";
+    std::cin >> b;
+
+    if (b == 'y' || b == 'Y') {
+        int n;
+        std::cout << "Enter the number of elements: ";
+        std::cin >> n;
+        sorter.printSortedNumbers(n, c);
+    } else if (b == 'n' || b == 'N'){
+        sorter.sortRandomNumbers(10, c);
+        sorter.sortRandomNumbers(50, c);
+        sorter.sortRandomNumbers(100, c);
+        sorter.sortRandomNumbers(200, c);
+        sorter.sortRandomNumbers(500, c);
+        sorter.sortRandomNumbers(800, c);
+        sorter.sortRandomNumbers(1000, c);
+        sorter.sortRandomNumbers(1500, c);
+        sorter.sortRandomNumbers(3000, c);
+        sorter.sortRandomNumbers(4500, c);
+        sorter.sortRandomNumbers(6000, c);
+        sorter.sortRandomNumbers(8000, c);
+        sorter.sortRandomNumbers(10000, c);
+        sorter.sortRandomNumbers(12500, c);
+        sorter.sortRandomNumbers(25000, c);
+        sorter.sortRandomNumbers(37500, c);
+        sorter.sortRandomNumbers(50000, c);
+        sorter.sortRandomNumbers(62500, c);
+        sorter.sortRandomNumbers(75000, c);
+        sorter.sortRandomNumbers(87500, c);
+        sorter.sortRandomNumbers(100000, c);
+    } else {
+        std::cout << "Invalid input.\n";
+    }
 
     return 0;
 }
+

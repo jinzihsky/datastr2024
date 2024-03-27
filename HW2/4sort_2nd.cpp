@@ -1,44 +1,47 @@
 #include <iostream>
 #include <vector>
 #include <string>
-using namespace std;
+#include <ctime>
+#include <chrono>
+#include <random>
 
 class StudentSorter {
 private:
-    vector<int> numbers;
+    std::vector<int> numbers;
 
-    static void insertionSort(vector<int>& arr) {
-        int i, j, key;
+    static void insertionSort(std::vector<int>& arr) {
+        int i, j, k;
         for (i = 1; i < arr.size(); i++) {
-            key = arr[i];
+            k = arr[i];
             j = i - 1;
-            while (j >= 0 && arr[j] > key) {
+            while (j >= 0 && arr[j] > k) {
                 arr[j + 1] = arr[j];
                 j = j - 1;
             }
-            arr[j + 1] = key;
+            arr[j + 1] = k;
         }
     }
 
-    static void quickSort(std::vector<int>& arr, int low, int high) {
-        if (low < high) {
-            int pivot = arr[high];
-            int i = (low - 1);
-            for (int j = low; j < high; j++) {
-                if (arr[j] < pivot) {
+    static void quickSort(std::vector<int>& arr, int l, int h) {
+        if (l < h) {
+            int p = arr[h];
+            int i = (l - 1);
+            for (int j = l; j < h; j++) {
+                if (arr[j] < p) {
                     i++;
                     std::swap(arr[i], arr[j]);
                 }
             }
-            std::swap(arr[i + 1], arr[high]);
+            std::swap(arr[i + 1], arr[h]);
             int pi = i + 1;
-            quickSort(arr, low, pi - 1);
-            quickSort(arr, pi + 1, high);
+            quickSort(arr, l, pi - 1);
+            quickSort(arr, pi + 1, h);
         }
     }
+
     static void mergeSort(std::vector<int>& arr, int l, int r) {
         if (l < r) {
-            int m = l + (r - l) / 2;
+            int m = l + (r - l) / 2; 
             mergeSort(arr, l, m);
             mergeSort(arr, m + 1, r);
 
@@ -56,118 +59,164 @@ private:
             while (j < R.size()) arr[k++] = R[j++];
         }
     }
+
+
     static void heapSort(std::vector<int>& arr) {
         int n = arr.size();
-
-        // 从最后一个非叶子节点开始向上构造大顶堆
         for (int i = n / 2 - 1; i >= 0; i--) {
-            int parent = i;
-            while (parent < n / 2) {
-                int largest = parent;
-                int left = 2 * parent + 1; // 左子节点索引
-                int right = 2 * parent + 2; // 右子节点索引
+            int p = i;
+            while (p >= 0) {
+                int lg = p;
+                int l = 2 * p + 1;
+                int r = 2 * p + 2;
 
-                if (left < n && arr[left] > arr[largest])
-                    largest = left;
-                if (right < n && arr[right] > arr[largest])
-                    largest = right;
+                if (l < n && arr[l] > arr[lg])
+                    lg = l;
+                if (r < n && arr[r] > arr[lg])
+                    lg = r;
 
-                if (largest == parent)
+                if (lg == p)
                     break;
-
-                // 如果父节点不是最大值，则交换父节点与最大值节点的位置
-                std::swap(arr[parent], arr[largest]);
-                parent = largest; // 继续调整交换后的子树
+                std::swap(arr[p], arr[lg]);
+                p = lg;
             }
         }
-
-        // 堆排序
         for (int i = n - 1; i > 0; i--) {
-            // 将堆顶元素与最后一个元素交换，确保最大的元素到达数组的末尾
             std::swap(arr[0], arr[i]);
+            int p = 0;
+            while (p < i / 2) {
+                int lg = p;
+                int l = 2 * p + 1;
+                int r = 2 * p + 2;
 
-            // 对剩余元素重新构造大顶堆
-            int parent = 0;
-            while (parent < i / 2) {
-                int largest = parent;
-                int left = 2 * parent + 1; // 左子节点索引
-                int right = 2 * parent + 2; // 右子节点索引
+                if (l < i && arr[l] > arr[lg])
+                    lg = l;
+                if (r < i && arr[r] > arr[lg])
+                    lg = r;
 
-                if (left < i && arr[left] > arr[largest])
-                    largest = left;
-                if (right < i && arr[right] > arr[largest])
-                    largest = right;
-
-                if (largest == parent)
+                if (lg == p)
                     break;
-
-                // 如果父节点不是最大值，则交换父节点与最大值节点的位置
-                std::swap(arr[parent], arr[largest]);
-                parent = largest; // 继续调整交换后的子树
+                std::swap(arr[p], arr[lg]);
+                p = lg;
             }
         }
     }
-
 
 public:
-    StudentSorter(const string& studentId) {
-        for (char digit : studentId.substr(1)) {
-            numbers.push_back(digit - '0');
-        }
-    }
+    void printSortedNumbers(int c, int s) {
+        std::vector<int> arr(c);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dis(1, 50000);
 
-    vector<int> sortAndAdd(int modResult) {
-        vector<int> sorted1(numbers), sorted2(numbers), sorted3(numbers);
-        switch (modResult) {
-            case 0:
-                insertionSort(sorted1);
-                quickSort(sorted2, 0, sorted2.size() - 1);
-                mergeSort(sorted3, 0, sorted3.size() - 1);
-                break;
+        for (int i = 0; i < c; ++i) {
+            arr[i] = dis(gen);
+        }
+        switch(s) {
             case 1:
-                quickSort(sorted1, 0, sorted1.size() - 1);
-                mergeSort(sorted2, 0, sorted2.size() - 1);
-                heapSort(sorted3);
+                insertionSort(arr);
                 break;
             case 2:
-                mergeSort(sorted1, 0, sorted1.size() - 1);
-                heapSort(sorted2);
-                insertionSort(sorted3);
+                quickSort(arr, 0, arr.size() - 1);
                 break;
             case 3:
-                heapSort(sorted1);
-                insertionSort(sorted2);
-                quickSort(sorted3, 0, sorted3.size() - 1);
+                mergeSort(arr, 0, arr.size() - 1);
                 break;
+            case 4:
+                heapSort(arr);
+                break;
+            default:
+                std::cout << "Invalid sorting method.\n";
+                return;
         }
+        for(int num : arr) {
+            std::cout << num << " ";
+        }
+        std::cout << "\n";
+    }
 
-        vector<int> result(numbers.size(), 0);
-        for (size_t i = 0; i < numbers.size(); i++) {
-            result[i] = sorted1[i] + sorted2[i] + sorted3[i];
+    void sortRandomNumbers(int c, int s) {
+        std::vector<int> arr(c);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dis(1, 50000);
+        
+        for (int i = 0; i < c; ++i) {
+            arr[i] = dis(gen);
         }
-        return result;
+        auto start = std::chrono::high_resolution_clock::now();
+        switch(s) {
+            case 1:
+                insertionSort(arr);
+                break;
+            case 2:
+                quickSort(arr, 0, arr.size() - 1);
+                break;
+            case 3:
+                mergeSort(arr, 0, arr.size() - 1);
+                break;
+            case 4:
+                heapSort(arr);
+                break;
+            default:
+                std::cout << "Invalid sorting method.\n";
+                return;
+        }
+        
+        auto end = std::chrono::high_resolution_clock::now();
+        
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        
+        std::cout<< duration.count() << "\n";
     }
 };
 
 int main() {
-    string studentId;
-    cout << "Enter an 8-digit student ID: ";
-    cin >> studentId;
+    StudentSorter sorter;
+    int c;
+    char b;
 
-    if (studentId.size() != 8 || !isalpha(studentId[0])) {
-        cout << "Invalid input format." << endl;
-        return 1;
+    std::cout << "1. Insertion Sort\n";
+    std::cout << "2. Quick Sort\n";
+    std::cout << "3. Merge Sort\n";
+    std::cout << "4. Heap Sort\n";
+    std::cout << "Choose a sorting method: ";
+    std::cin >> c;
+
+    std::cout << "Do you want to enter the number of elements manually? (y/n): ";
+    std::cin >> b;
+
+    if (b == 'y' || b == 'Y') {
+        int n;
+        std::cout << "Enter the number of elements: ";
+        std::cin >> n;
+        sorter.printSortedNumbers(n, c);
+    } else if (b == 'n' || b == 'N'){
+        sorter.sortRandomNumbers(10, c);
+        sorter.sortRandomNumbers(50, c);
+        sorter.sortRandomNumbers(100, c);
+        sorter.sortRandomNumbers(200, c);
+        sorter.sortRandomNumbers(500, c);
+        sorter.sortRandomNumbers(800, c);
+        sorter.sortRandomNumbers(1000, c);
+        sorter.sortRandomNumbers(1500, c);
+        sorter.sortRandomNumbers(3000, c);
+        sorter.sortRandomNumbers(4500, c);
+        sorter.sortRandomNumbers(6000, c);
+        sorter.sortRandomNumbers(8000, c);
+        sorter.sortRandomNumbers(10000, c);
+        sorter.sortRandomNumbers(12500, c);
+        sorter.sortRandomNumbers(25000, c);
+        sorter.sortRandomNumbers(37500, c);
+        sorter.sortRandomNumbers(50000, c);
+        sorter.sortRandomNumbers(62500, c);
+        sorter.sortRandomNumbers(75000, c);
+        sorter.sortRandomNumbers(87500, c);
+        sorter.sortRandomNumbers(100000, c);
+    } else {
+        std::cout << "Invalid input.\n";
     }
-
-    StudentSorter sorter(studentId);
-    int modResult = (studentId.back() - '0') % 4;
-    vector<int> result = sorter.sortAndAdd(modResult);
-
-    cout << "Resulting numbers after sorting and adding: ";
-    for (int num : result) {
-        cout << num << " ";
-    }
-    cout << endl;
 
     return 0;
 }
+

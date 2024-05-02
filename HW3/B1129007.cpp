@@ -2,23 +2,50 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <queue>
 
-class AdjMatrixGraph {
-private:
-    int V;
-    std::vector<std::vector<bool>> adjMatrix;
-
+class Graph {
 public:
-    AdjMatrixGraph(int vertices) : V(vertices) {
+    std::vector<std::vector<int>> adjList;
+    std::vector<std::vector<bool>> adjMatrix;
+    int V; // Number of vertices
+
+    Graph(int n) : V(n) {
+        adjList.resize(V);
         adjMatrix.resize(V, std::vector<bool>(V, false));
     }
 
-    void addEdge(int u, int v) {
-        adjMatrix[u][v] = adjMatrix[v][u] = true;
+    void addEdge(int v1, int v2) {
+        adjList[v1].push_back(v2);
+        adjList[v2].push_back(v1);
+        adjMatrix[v1][v2] = adjMatrix[v2][v1] = true;
     }
 
-    bool hasEdge(int u, int v) {
-        return adjMatrix[u][v];
+    void generateRandomGraph(int e) {
+        if (e > V * (V - 1) / 2) {
+            std::cout << "Invalid number of edges. Maximum number of edges for " << V << " vertices is " << V * (V - 1) / 2 << std::endl;
+            return;
+        }
+        for (int i = 0; i < e; ++i) {
+            int u = rand() % V;
+            int v = rand() % V;
+            while (u == v || adjMatrix[u][v]) {
+                u = rand() % V;
+                v = rand() % V;
+            }
+            addEdge(u, v);
+        }
+    }
+
+    void printAdjList() {
+        std::cout << "Adjacency List:" << std::endl;
+        for (int i = 0; i < V; ++i) {
+            std::cout << i << " --> ";
+            for (int num : adjList[i]) {
+                std::cout << num << " ";
+            }
+            std::cout << std::endl;
+        }
     }
 
     void printAdjMatrix() {
@@ -32,29 +59,54 @@ public:
     }
 };
 
-class AdjListGraph {
+class DFS {
 private:
-    int V;
-    std::vector<std::vector<int>> adjList;
+    std::vector<bool> visited;
+    Graph& graph;
 
 public:
-    AdjListGraph(int vertices) : V(vertices) {
-        adjList.resize(V);
+    DFS(Graph& g) : graph(g) {
+        visited.resize(graph.V, false);
     }
 
-    void addEdge(int u, int v) {
-        adjList[u].push_back(v);
-        adjList[v].push_back(u);
-    }
+    void dfs(int start) {
+        visited[start] = true;
+        std::cout << "DFS visits: " << start << std::endl;
 
-    void printAdjList() {
-        std::cout << "Adjacency List:" << std::endl;
-        for (int i = 0; i < V; ++i) {
-            std::cout << i << " --> ";
-            for (int j = 0; j < adjList[i].size(); ++j) {
-                std::cout << adjList[i][j] << " ";
+        for (int adj : graph.adjList[start]) {
+            if (!visited[adj]) {
+                dfs(adj);
             }
-            std::cout << std::endl;
+        }
+    }
+};
+
+class BFS {
+private:
+    std::vector<bool> visited;
+    Graph& graph;
+
+public:
+    BFS(Graph& g) : graph(g) {
+        visited.resize(graph.V, false);
+    }
+
+    void bfs(int start) {
+        std::queue<int> queue;
+        visited[start] = true;
+        queue.push(start);
+
+        while (!queue.empty()) {
+            int current = queue.front();
+            queue.pop();
+            std::cout << "BFS visits: " << current << std::endl;
+
+            for (int adj : graph.adjList[current]) {
+                if (!visited[adj]) {
+                    visited[adj] = true;
+                    queue.push(adj);
+                }
+            }
         }
     }
 };
@@ -68,29 +120,20 @@ int main() {
     std::cout << "Enter the number of edges (e): ";
     std::cin >> e;
 
-    if (e > n * (n - 1) / 2) {
-        std::cout << "Invalid number of edges. Maximum number of edges for " << n << " nodes is " << n * (n - 1) / 2 << std::endl;
-        return 1;
-    }
+    Graph graph(n);
+    graph.generateRandomGraph(e);
 
-    AdjMatrixGraph matrixGraph(n);
-    AdjListGraph listGraph(n);
+    graph.printAdjMatrix();
+    graph.printAdjList();
 
-    for (int i = 0; i < e; ++i) {
-        int u = rand() % n;
-        int v = rand() % n;
+    DFS dfs(graph);
+    std::cout << "DFS Execution Order:" << std::endl;
+    dfs.dfs(0);
 
-        while (u == v || matrixGraph.hasEdge(u, v)) {
-            u = rand() % n;
-            v = rand() % n;
-        }
-
-        matrixGraph.addEdge(u, v);
-        listGraph.addEdge(u, v);
-    }
-
-    matrixGraph.printAdjMatrix();
-    listGraph.printAdjList();
+    BFS bfs(graph);
+    std::cout << "BFS Execution Order:" << std::endl;
+    bfs.bfs(0);
 
     return 0;
 }
+

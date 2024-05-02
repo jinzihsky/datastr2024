@@ -3,62 +3,94 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace std;
+class AdjMatrixGraph {
+private:
+    int V;
+    std::vector<std::vector<bool>> adjMatrix;
 
+public:
+    AdjMatrixGraph(int vertices) : V(vertices) {
+        adjMatrix.resize(V, std::vector<bool>(V, false));
+    }
 
-void generateRandomGraph(int n, int e) {
+    void addEdge(int u, int v) {
+        adjMatrix[u][v] = adjMatrix[v][u] = true;
+    }
+
+    bool hasEdge(int u, int v) {
+        return adjMatrix[u][v];
+    }
+
+    void printAdjMatrix() {
+        std::cout << "Adjacency Matrix:" << std::endl;
+        for (int i = 0; i < V; ++i) {
+            for (int j = 0; j < V; ++j) {
+                std::cout << adjMatrix[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+};
+
+class AdjListGraph {
+private:
+    int V;
+    std::vector<std::vector<int>> adjList;
+
+public:
+    AdjListGraph(int vertices) : V(vertices) {
+        adjList.resize(V);
+    }
+
+    void addEdge(int u, int v) {
+        adjList[u].push_back(v);
+        adjList[v].push_back(u);
+    }
+
+    void printAdjList() {
+        std::cout << "Adjacency List:" << std::endl;
+        for (int i = 0; i < V; ++i) {
+            std::cout << i << " --> ";
+            for (int j = 0; j < adjList[i].size(); ++j) {
+                std::cout << adjList[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+};
+
+int main() {
     srand(time(0));
 
+    int n, e;
+    std::cout << "Enter the number of nodes (n): ";
+    std::cin >> n;
+    std::cout << "Enter the number of edges (e): ";
+    std::cin >> e;
 
-    vector<vector<int>> adjacencyMatrix(n, vector<int>(n, 0));
+    if (e > n * (n - 1) / 2) {
+        std::cout << "Invalid number of edges. Maximum number of edges for " << n << " nodes is " << n * (n - 1) / 2 << std::endl;
+        return 1;
+    }
 
-    vector<vector<pair<int, int>>> adjacencyList(n);
-
+    AdjMatrixGraph matrixGraph(n);
+    AdjListGraph listGraph(n);
 
     for (int i = 0; i < e; ++i) {
         int u = rand() % n;
         int v = rand() % n;
-        int weight = rand() % 100 + 1;
-        while (u == v || adjacencyMatrix[u][v] != 0) {
+
+        while (u == v || matrixGraph.hasEdge(u, v)) {
             u = rand() % n;
             v = rand() % n;
         }
 
-        adjacencyMatrix[u][v] = weight;
-        adjacencyMatrix[v][u] = weight;
-
-        adjacencyList[u].push_back({v, weight});
-        adjacencyList[v].push_back({u, weight});
+        matrixGraph.addEdge(u, v);
+        listGraph.addEdge(u, v);
     }
 
-
-    cout << "Adjacency Matrix:" << endl;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            cout << adjacencyMatrix[i][j] << " ";
-        }
-        cout << endl;
-    }
-
-
-    cout << "Adjacency List:" << endl;
-    for (int i = 0; i < n; ++i) {
-        cout << i << ": ";
-        for (auto& edge : adjacencyList[i]) {
-            cout << "(" << edge.first << ", " << edge.second << ") ";
-        }
-        cout << endl;
-    }
-}
-
-int main() {
-    int n, e;
-    cout << "Enter the number of nodes (n): ";
-    cin >> n;
-    cout << "Enter the number of edges (e): ";
-    cin >> e;
-
-    generateRandomGraph(n, e);
+    matrixGraph.printAdjMatrix();
+    listGraph.printAdjList();
 
     return 0;
 }

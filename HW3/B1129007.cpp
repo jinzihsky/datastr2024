@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <queue>
+#include <algorithm>
 
 class Graph {
 public:
@@ -37,22 +38,34 @@ public:
         }
     }
 
-    void printAdjList() {
-        std::cout << "Adjacency List:" << std::endl;
-        for (int i = 0; i < V; ++i) {
-            std::cout << i << " --> ";
-            for (int num : adjList[i]) {
-                std::cout << num << " ";
+    std::vector<std::vector<bool>> reorderMatrix(const std::vector<int>& order) {
+        std::vector<std::vector<bool>> newMatrix(V, std::vector<bool>(V, false));
+        for (int i = 0; i < V; i++) {
+            for (int j : adjList[order[i]]) {
+                auto pos = std::find(order.begin(), order.end(), j);
+                if (pos != order.end()) {
+                    int newJ = std::distance(order.begin(), pos);
+                    newMatrix[i][newJ] = true;
+                }
+            }
+        }
+        return newMatrix;
+    }
+
+    void printMatrix(const std::vector<std::vector<bool>>& matrix) {
+        for (const auto& row : matrix) {
+            for (bool val : row) {
+                std::cout << val << " ";
             }
             std::cout << std::endl;
         }
     }
 
-    void printAdjMatrix() {
-        std::cout << "Adjacency Matrix:" << std::endl;
+    void printList() {
         for (int i = 0; i < V; ++i) {
-            for (int j = 0; j < V; ++j) {
-                std::cout << adjMatrix[i][j] << " ";
+            std::cout << i << " --> ";
+            for (int num : adjList[i]) {
+                std::cout << num << " ";
             }
             std::cout << std::endl;
         }
@@ -63,6 +76,7 @@ class DFS {
 private:
     std::vector<bool> visited;
     Graph& graph;
+    std::vector<int> order;
 
 public:
     DFS(Graph& g) : graph(g) {
@@ -71,6 +85,7 @@ public:
 
     void dfs(int start) {
         visited[start] = true;
+        order.push_back(start);
         std::cout << "DFS visits: " << start << std::endl;
 
         for (int adj : graph.adjList[start]) {
@@ -79,12 +94,17 @@ public:
             }
         }
     }
+
+    std::vector<int> getOrder() {
+        return order;
+    }
 };
 
 class BFS {
 private:
     std::vector<bool> visited;
     Graph& graph;
+    std::vector<int> order;
 
 public:
     BFS(Graph& g) : graph(g) {
@@ -95,6 +115,7 @@ public:
         std::queue<int> queue;
         visited[start] = true;
         queue.push(start);
+        order.push_back(start);
 
         while (!queue.empty()) {
             int current = queue.front();
@@ -105,9 +126,14 @@ public:
                 if (!visited[adj]) {
                     visited[adj] = true;
                     queue.push(adj);
+                    order.push_back(adj);
                 }
             }
         }
+    }
+
+    std::vector<int> getOrder() {
+        return order;
     }
 };
 
@@ -123,17 +149,27 @@ int main() {
     Graph graph(n);
     graph.generateRandomGraph(e);
 
-    graph.printAdjMatrix();
-    graph.printAdjList();
+    std::cout << "Adjacency Matrix:" << std::endl;
+    graph.printMatrix(graph.adjMatrix);
+
+    std::cout << "Adjacency List:" << std::endl;
+    graph.printList();
 
     DFS dfs(graph);
     std::cout << "DFS Execution Order:" << std::endl;
     dfs.dfs(0);
+    auto dfsOrder = dfs.getOrder();
+    auto dfsMatrix = graph.reorderMatrix(dfsOrder);
+    std::cout << "DFS reordered Adjacency Matrix:" << std::endl;
+    graph.printMatrix(dfsMatrix);
 
     BFS bfs(graph);
     std::cout << "BFS Execution Order:" << std::endl;
     bfs.bfs(0);
+    auto bfsOrder = bfs.getOrder();
+    auto bfsMatrix = graph.reorderMatrix(bfsOrder);
+    std::cout << "BFS reordered Adjacency Matrix:" << std::endl;
+    graph.printMatrix(bfsMatrix);
 
     return 0;
 }
-

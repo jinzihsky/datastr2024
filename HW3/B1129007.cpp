@@ -70,6 +70,16 @@ public:
             std::cout << std::endl;
         }
     }
+
+    void printEdgeList() {
+        for (int i = 0; i < V; ++i) {
+            for (int num : adjList[i]) {
+                if (i < num) {
+                    std::cout << i << " " << num << std::endl;
+                }
+            }
+        }
+    }
 };
 
 class DFS {
@@ -154,6 +164,9 @@ int main() {
 
     std::cout << "Adjacency List:" << std::endl;
     graph.printList();
+
+    std::cout << "Edge List:" << std::endl;
+    graph.printEdgeList();
 
     DFS dfs(graph);
     std::cout << "DFS Execution Order:" << std::endl;
